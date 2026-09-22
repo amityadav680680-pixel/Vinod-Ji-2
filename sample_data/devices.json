@@ -1,0 +1,20 @@
+{
+  "devices": [
+    {
+      "name": "Pixel 8",
+      "model": "GKWS6",
+      "serial": "SN-PIXEL-010",
+      "imei": "358765432109876",
+      "phone": "9112233445",
+      "notes": "JSON sample"
+    },
+    {
+      "name": "iPad Air",
+      "model": "iPad13",
+      "serial": "SN-IPAD-011",
+      "imei": "",
+      "phone": "",
+      "notes": "Tablet"
+    }
+  ]
+}
