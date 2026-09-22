@@ -108,6 +108,38 @@ class DeviceDB:
             ).fetchall()
             return list(rows)
 
+    def get_by_id(self, owner_chat_id: int, device_id: int) -> sqlite3.Row | None:
+        with self._connect() as conn:
+            return conn.execute(
+                "SELECT * FROM devices WHERE id = ? AND owner_chat_id = ?",
+                (device_id, owner_chat_id),
+            ).fetchone()
+
+    def get_by_device_id(self, owner_chat_id: int, device_id: str) -> sqlite3.Row | None:
+        """Lookup by numeric DB id, else exact serial / IMEI / phone."""
+        key = device_id.strip()
+        if not key:
+            return None
+        if key.isdigit():
+            row = self.get_by_id(owner_chat_id, int(key))
+            if row is not None:
+                return row
+        with self._connect() as conn:
+            return conn.execute(
+                """
+                SELECT * FROM devices
+                WHERE owner_chat_id = ?
+                  AND (
+                    IFNULL(serial, '') = ? COLLATE NOCASE
+                    OR IFNULL(imei, '') = ? COLLATE NOCASE
+                    OR IFNULL(phone, '') = ? COLLATE NOCASE
+                  )
+                ORDER BY id DESC
+                LIMIT 1
+                """,
+                (owner_chat_id, key, key, key),
+            ).fetchone()
+
     def delete_device(self, owner_chat_id: int, device_id: int) -> bool:
         with self._connect() as conn:
             cur = conn.execute(

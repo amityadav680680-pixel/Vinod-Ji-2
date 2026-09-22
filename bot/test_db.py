@@ -42,6 +42,23 @@ class DeviceDBTests(unittest.TestCase):
         self.assertEqual(self.db.count(2), 1)
         self.assertEqual(len(self.db.search(1, "B")), 0)
 
+    def test_get_by_device_id(self) -> None:
+        did = self.db.add_device(
+            self.owner,
+            "iPhone 14",
+            serial="SN-IPHONE-001",
+            imei="356789012345678",
+        )
+        by_id = self.db.get_by_device_id(self.owner, str(did))
+        self.assertIsNotNone(by_id)
+        self.assertEqual(by_id["name"], "iPhone 14")
+        by_serial = self.db.get_by_device_id(self.owner, "SN-IPHONE-001")
+        self.assertIsNotNone(by_serial)
+        by_imei = self.db.get_by_device_id(self.owner, "356789012345678")
+        self.assertIsNotNone(by_imei)
+        missing = self.db.get_by_device_id(self.owner, "99999")
+        self.assertIsNone(missing)
+
     def test_csv_import(self) -> None:
         sample = Path(__file__).resolve().parent.parent / "sample_data" / "devices.csv"
         n = self.db.import_file(self.owner, sample)

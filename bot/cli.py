@@ -30,6 +30,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("list", help="Devices list")
     find = sub.add_parser("find", help="Search")
     find.add_argument("query")
+    a = sub.add_parser("a", help="/a deviceid lookup")
+    a.add_argument("deviceid")
     sub.add_parser("count", help="Count")
     imp = sub.add_parser("import", help="CSV/JSON import")
     imp.add_argument("file")
@@ -60,6 +62,12 @@ def main() -> None:
             print("No match.")
             return
         print("\n\n".join(format_device(r) for r in rows))
+    elif args.cmd == "a":
+        row = db.get_by_device_id(owner, args.deviceid)
+        if row is None:
+            print("No match.")
+            return
+        print(format_device(row))
     elif args.cmd == "count":
         print(db.count(owner))
     elif args.cmd == "import":

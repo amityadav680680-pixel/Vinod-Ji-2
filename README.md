@@ -63,6 +63,7 @@ Chat mein JSON bhejo. Sample: `sample_data/devices.json`
 | Command | Kaam |
 |---------|------|
 | `/start` `/help` | Help |
+| `/a deviceid` | ID / serial / IMEI se device lao |
 | `/add ...` | Device add |
 | `/list` | Saari devices |
 | `/find query` | Search — device aa jayegi |
@@ -77,6 +78,7 @@ Chat mein JSON bhejo. Sample: `sample_data/devices.json`
 ```bash
 python -m bot.cli import sample_data/devices.csv
 python -m bot.cli list
+python -m bot.cli a 1
 python -m bot.cli find iPhone
 python -m bot.cli add "My Phone" --model Android --imei 123
 ```

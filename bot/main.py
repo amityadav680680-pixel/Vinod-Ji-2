@@ -37,6 +37,7 @@ Apna device database yahan daalo — search karte hi device aa jayega.
 *Commands:*
 /start — bot shuru
 /help — yeh message
+/a `deviceid` — ID / serial / IMEI se device lao
 /add `Name | Model | Serial | IMEI | Phone | Notes`
 /list — saari devices
 /find `query` — naam / serial / IMEI / phone se search
@@ -50,6 +51,8 @@ CSV ya JSON file seedha chat mein bhej do.
 Columns: `name,model,serial,imei,phone,notes`
 
 *Example:*
+`/a 1`
+`/a SN-IPHONE-001`
 `/add iPhone 14 | Apple | SN123 | 356789012345678 | 9876543210 | Ghar wala`
 `/find iPhone`
 """.strip()
@@ -65,6 +68,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(HELP_TEXT, parse_mode="Markdown")
+
+
+async def a_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """ /a <deviceid> — seedha device details dikhao. """
+    chat_id = update.effective_chat.id
+    if not context.args:
+        await update.message.reply_text(
+            "Usage: /a <deviceid>\nExample: /a 1  ya  /a SN-IPHONE-001"
+        )
+        return
+    device_id = " ".join(context.args).strip()
+    row = db.get_by_device_id(chat_id, device_id)
+    if row is None:
+        await update.message.reply_text(f"❌ Device nahi mili: `{device_id}`", parse_mode="Markdown")
+        return
+    await update.message.reply_text(
+        f"📱 *Device mil gayi:*\n\n{format_device(row)}",
+        parse_mode="Markdown",
+    )
 
 
 async def add_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -195,6 +217,7 @@ def main() -> None:
     app = Application.builder().token(token).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
+    app.add_handler(CommandHandler("a", a_cmd))
     app.add_handler(CommandHandler("add", add_cmd))
     app.add_handler(CommandHandler("list", list_cmd))
     app.add_handler(CommandHandler("find", find_cmd))
